@@ -15,7 +15,7 @@ let downInterval;
 let tempMovingItem;
 
 const movingItem = {
-    type:"elLeft", //종류
+    type:"", //종류
     direction : 0, //모양
     top:0, //위치
     left:3
@@ -27,16 +27,16 @@ const init = ()=>{
     for( let i = 0; i< GAME_ROWS ;i++){
         prependNewLine();
     }
-    renderBlocks();
+    generateNewBlock();
 }
 
 const prependNewLine = () => {
     let $tr = document.createElement('tr');        
     for(let j =0; j<GAME_COLS; j++){
         let $td = document.createElement('td');
-        $tr.append($td);
+        $tr.prepend($td);
     };
-    $tbody.append($tr);
+    $tbody.prepend($tr);
 };
 
 const renderBlocks = (moveType="") => {
@@ -86,14 +86,52 @@ const seizeBlock = ()=>{
         moving.classList.remove('moving');
         moving.classList.add('seized');  
     })
-    console.log('gererate in seizeBlock')     
-    generateNewBlock(); 
+      
+    checkMatch();
+}
+
+const checkMatch = () =>{ 
+
+    const rows = $tbody.childNodes; //전체 tr
+    rows.forEach(row=>{     
+        let matched = true;        
+        row.childNodes.forEach(td=>{               
+            if(!td.classList.contains('seized')){
+                matched = false;
+            };
+        });
+        if(matched){
+            row.remove();
+            prependNewLine();
+        }
+    });    
+
+    // const seizedBlocks = document.querySelectorAll('.seized');
+    // seizedBlocks.forEach(seizedBlock=>{
+    //     // console.log('seizedparentNode',seizedBlock.parentNode)
+    //     console.log('seizedparentNode_seizedChlidNum',seizedBlock.parentNode.querySelectorAll('.seized').length)        
+    //     if(seizedBlock.parentNode.querySelectorAll('.seized') === 10) {
+            
+    //     };
+    // })
+
+    generateNewBlock();
 }
 
 const generateNewBlock = () =>{
     console.log('generate');
-    const typeList = ["tree", "line", "elLeft","elRight","zee","square"];
-    const chosenType = typeList[Math.floor(Math.random()*6)];
+    // clearInterval(downInterval);
+    // downInterval = setInterval(() => {        
+    //     moveBlock('top',1);
+    // }, duration);
+
+    const blockArray = Object.entries(BLOCKS); //[[key,value],[key,value],]
+    const typeList = [];
+    blockArray.forEach(block=>{
+        typeList.push(block[0])
+    })
+    
+    const chosenType = typeList[Math.floor(Math.random()*blockArray.length)];
     const chosenDirection = Math.floor(Math.random()*4);
     
     // 나는 tempMovingItem을 바꿨는데, 강의에서는 movingItem을 바꿈
@@ -133,6 +171,14 @@ const changeDirection = () => {
     renderBlocks();
 }
 
+const dropBlock = () =>{
+    console.log('dropBlock')
+    clearInterval(downInterval);
+    downInterval = setInterval(() => {
+        moveBlock('top',1);
+    }, 10);
+}
+
 //event handling
 document.addEventListener('keydown',e=>{        
     switch (e.code) {
@@ -146,8 +192,11 @@ document.addEventListener('keydown',e=>{
             moveBlock('top',1);                
             break;
         case 'ArrowUp':        
-        changeDirection();
+            changeDirection();
         break;
+        // case 'Space':        
+        //     dropBlock();
+        // break;
         default:
             break;
     }
