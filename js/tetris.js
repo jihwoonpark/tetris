@@ -3,6 +3,8 @@ import BLOCKS from './blocks.js';
 //DOM
 const $playground = document.querySelector('#playground');
 const $tbody = $playground.querySelector('tbody');
+const $gameText = document.querySelector('.game-text');
+const $scoreDisplay = document.querySelector('.score');
 
 // Setting
 const GAME_ROWS = 20;
@@ -55,14 +57,21 @@ const renderBlocks = (moveType="") => {
        
         const target = $tbody.children[y] ? $tbody.children[y].children[x] : null;
         // console.log('target.classList.contains(seized)',target?.classList.contains('seized'))
-        const isAvailable = checkEmpty(target);
+        const isAvailable = checkEmpty(target); //다음 칸이 비었거나 seized 클래스가 있는지 확인
         if(isAvailable){
             target.classList.add(type, 'moving');             
         }else{    
             tempMovingItem = {...movingItem}; //이전 상태로 되돌림
+            if(moveType==='retry'){
+              clearInterval(downInterval);
+              // document.removeEventListener('keydown');
+              showGameoverText();
+            }
             setTimeout(()=>{//재귀함수, maximum call stack 방지    
                 console.log('setTimeout');              
-                renderBlocks();//seizeBlock전에 실행해야 이전상태로 돌아감
+                //renderBlocks가 2번실행되면 즉, 이전상태로 돌렸는데도 다음 칸이 또 seizedBlock이라면 해당 block이 제일 꼭대기에 있다는 의미
+                //=> 이런 논리는 따라가기 힘들다
+                renderBlocks('retry');//seizeBlock전에 실행해야 이전상태로 돌아감                
                 if(moveType ==="top"){
                     seizeBlock();
                 }else if(moveType ==="left" && target?.classList.contains('seized')){
@@ -79,22 +88,25 @@ const renderBlocks = (moveType="") => {
     console.log('after', movingItem);
 };
 
+const showGameoverText = () =>{ 
+  $gameText.style.display = 'flex'
+}
+
 const seizeBlock = ()=>{
     console.log('seizeBlock')
     const movingBlocks = document.querySelectorAll('.moving');//처음엔 nodelist[]           
     movingBlocks.forEach(moving=>{        
         moving.classList.remove('moving');
         moving.classList.add('seized');  
-    })
-      
+    })    
     checkMatch();
-}
+};
 
 const checkMatch = () =>{ 
-
     const rows = $tbody.childNodes; //전체 tr
-    rows.forEach(row=>{     
-        let matched = true;        
+    rows.forEach(row=>{ //각tr    
+        let matched = true;   
+        let gameEnd = false;     
         row.childNodes.forEach(td=>{               
             if(!td.classList.contains('seized')){
                 matched = false;
@@ -120,10 +132,10 @@ const checkMatch = () =>{
 
 const generateNewBlock = () =>{
     console.log('generate');
-    // clearInterval(downInterval);
-    // downInterval = setInterval(() => {        
-    //     moveBlock('top',1);
-    // }, duration);
+    clearInterval(downInterval);
+    downInterval = setInterval(() => {        
+        moveBlock('top',1);
+    }, duration);
 
     const blockArray = Object.entries(BLOCKS); //[[key,value],[key,value],]
     const typeList = [];
@@ -194,9 +206,9 @@ document.addEventListener('keydown',e=>{
         case 'ArrowUp':        
             changeDirection();
         break;
-        // case 'Space':        
-        //     dropBlock();
-        // break;
+        case 'Space':        
+            dropBlock();
+        break;
         default:
             break;
     }
