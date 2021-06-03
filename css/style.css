@@ -5,14 +5,14 @@
 
 .wrapper{
     width: 100%;    
-    background-color: blueviolet;
+    background-color:darkslategray;
+    display: flex; 
+    justify-content: center;
 }
 
 .inner {
-    max-width: 80%;    
-    /* height: 600px; */
-    margin: 10px auto;
-    background-color:chocolate;
+    /* max-width: 100%;     */    
+    display: inline-flex;    
 }
 .game-text {
     display: none;
@@ -36,23 +36,14 @@
     cursor: pointer;
 }
 
-.score{
-    text-align:center;
-    font-size: 36px;
-    margin-bottom: 2rem;
-}
-
-#playground{
-    max-width: 250px;    
-    margin: 10px auto;
+/* playground */
+#playground{    
+    max-width: 250px;
+    margin: 0 auto;
     box-sizing: border-box;
     border-collapse: collapse;
     background-color: white;
-    /* border: 1px solid #333; */
-}
-
-#playground > tbody{
-    border: 1px solid #333;
+    border: 10px solid #333;  
 }
 
 #playground > tbody > tr {    
@@ -79,23 +70,48 @@
     border-right: none;
 }
 
+/* right display */
+.inner-right{    
+    max-width: 200px;
+    margin-left:10px;    
+}
+
+.scoreBox, .levelBox, .shapeBox {
+    border: 5px solid #333;
+    box-sizing: border-box;
+    background-color: #fff;
+    padding: 5px;
+}
+
+.scoreBox > h2, .levelBox > h2, .shapeBox > h2{
+    text-align:center;
+    font-size: 24px;
+}
+
+.scoreBox > .score, .levelBox > .level, .shapeBox > .shape{
+    text-align: center;
+    font-size: 24px;    
+}
+
+
+/* game item shape */
 .tree {
-    background-color: yellowgreen;
+    background-color: yellowgreen;    
 }
 
 .square {
-    background-color:darkorchid;
+    background-color:darkorchid; 
 }
 
 .line{
-    background-color: darksalmon;
+    background-color: darksalmon;    
 }
 .elLeft{
-    background-color:deepskyblue ;
+    background-color:deepskyblue ;    
 }
 .elRight{
-    background-color:deepskyblue ;
+    background-color:deepskyblue ;    
 }
 .zee{
-    background-color:brown
+    background-color:brown; 
 }

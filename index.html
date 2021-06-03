@@ -10,14 +10,27 @@
 <body>
     <div class="wrapper">
         <div class="inner">
-						<div class="game-text">
-							<span>게임종료</span>
-							<button>다시시작</button>
-						</div>
-            <div class="score">0</div>         
+			<div class="game-text">
+				<span>게임종료</span>
+				<button>다시시작</button>
+			</div>                   
             <table id="playground">
-                <tbody></tbody>           
+                <tbody></tbody>       
             </table>
+            <div class="inner-right">
+                <div class="scoreBox">
+                    <h2>score</h2>
+                    <div class="score">0</div>
+                </div>
+                <div class="levelBox">
+                    <h2>level</h2>
+                    <div class="level">1</div>
+                </div>
+                <div class="shapeBox">
+                    <h2>next shape</h2>
+                    <div class="shape">1</div>
+                </div>                
+            </div>            
         </div>        
     </div>
     <script src="./js/tetris.js" type="module"></script>

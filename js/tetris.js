@@ -4,6 +4,7 @@ import BLOCKS from './blocks.js';
 const $playground = document.querySelector('#playground');
 const $tbody = $playground.querySelector('tbody');
 const $gameText = document.querySelector('.game-text');
+const $retryButton = document.querySelector('.game-text > button');
 const $scoreDisplay = document.querySelector('.score');
 
 // Setting
@@ -12,7 +13,7 @@ const GAME_COLS = 10;
 
 //variables
 let score = 0;
-let duration = 500;
+let duration = 1000;
 let downInterval;
 let tempMovingItem;
 
@@ -33,9 +34,12 @@ const init = ()=>{
 }
 
 const prependNewLine = () => {
-    let $tr = document.createElement('tr');        
+    let $tr = document.createElement('tr');
+    $tr.style.border = 'none';
     for(let j =0; j<GAME_COLS; j++){
         let $td = document.createElement('td');
+        $td.style.border = 'none';
+        $td.style.boxSizing = 'border-box';
         $tr.prepend($td);
     };
     $tbody.prepend($tr);
@@ -47,19 +51,21 @@ const renderBlocks = (moveType="") => {
     const movingBlocks = document.querySelectorAll('.moving');//처음엔 nodelist[]       
 
     movingBlocks.forEach(moving=>{
-        moving.classList.remove(type,'moving');        
+        moving.classList.remove(type,'moving');
+        moving.style.boxShadow ='';
     })    
-    console.log('before', movingItem);
+    // console.log('before', movingItem);
     BLOCKS[type][direction].some(coord =>{//forEach는 중간에 return할 수 없어서 some으로 변경
         let x = coord[0] + left;
-        let y = coord[1] + top;
-        // console.log('coor', coord);
+        let y = coord[1] + top;        
        
-        const target = $tbody.children[y] ? $tbody.children[y].children[x] : null;
-        // console.log('target.classList.contains(seized)',target?.classList.contains('seized'))
+        const target = $tbody.children[y] ? $tbody.children[y].children[x] : null;        
         const isAvailable = checkEmpty(target); //다음 칸이 비었거나 seized 클래스가 있는지 확인
+
         if(isAvailable){
-            target.classList.add(type, 'moving');             
+            target.classList.add(type, 'moving');
+            target.style.border = '1px solid #fff';
+            target.style.boxShadow ='inset -10px -10px 10px rgba(0,0,0,.1)';
         }else{    
             tempMovingItem = {...movingItem}; //이전 상태로 되돌림
             if(moveType==='retry'){
@@ -68,7 +74,7 @@ const renderBlocks = (moveType="") => {
               showGameoverText();
             }
             setTimeout(()=>{//재귀함수, maximum call stack 방지    
-                console.log('setTimeout');              
+                // console.log('setTimeout');              
                 //renderBlocks가 2번실행되면 즉, 이전상태로 돌렸는데도 다음 칸이 또 seizedBlock이라면 해당 block이 제일 꼭대기에 있다는 의미
                 //=> 이런 논리는 따라가기 힘들다
                 renderBlocks('retry');//seizeBlock전에 실행해야 이전상태로 돌아감                
@@ -85,7 +91,7 @@ const renderBlocks = (moveType="") => {
     movingItem.direction = direction;
     movingItem.left = left;
     movingItem.top = top;    
-    console.log('after', movingItem);
+    // console.log('after', movingItem);
 };
 
 const showGameoverText = () =>{ 
@@ -93,7 +99,7 @@ const showGameoverText = () =>{
 }
 
 const seizeBlock = ()=>{
-    console.log('seizeBlock')
+    // console.log('seizeBlock')
     const movingBlocks = document.querySelectorAll('.moving');//처음엔 nodelist[]           
     movingBlocks.forEach(moving=>{        
         moving.classList.remove('moving');
@@ -105,8 +111,7 @@ const seizeBlock = ()=>{
 const checkMatch = () =>{ 
     const rows = $tbody.childNodes; //전체 tr
     rows.forEach(row=>{ //각tr    
-        let matched = true;   
-        let gameEnd = false;     
+        let matched = true;        
         row.childNodes.forEach(td=>{               
             if(!td.classList.contains('seized')){
                 matched = false;
@@ -114,6 +119,8 @@ const checkMatch = () =>{
         });
         if(matched){
             row.remove();
+            score += 10;
+            $scoreDisplay.innerHTML = score;
             prependNewLine();
         }
     });    
@@ -131,7 +138,7 @@ const checkMatch = () =>{
 }
 
 const generateNewBlock = () =>{
-    console.log('generate');
+    // console.log('generate');
     clearInterval(downInterval);
     downInterval = setInterval(() => {        
         moveBlock('top',1);
@@ -158,14 +165,12 @@ const generateNewBlock = () =>{
     movingItem.left = 3;
 
     tempMovingItem = {...movingItem};
-
-    // console.log(chosenType);
-    // console.log(chosenDirection);
+    
     renderBlocks();
 }
 
 const checkEmpty = (target) =>{
-    console.log('checkEnmpty target', target) 
+    // console.log('checkEnmpty target', target) 
     if(!target || target.classList.contains('seized')){
         return false;
     }
@@ -184,7 +189,7 @@ const changeDirection = () => {
 }
 
 const dropBlock = () =>{
-    console.log('dropBlock')
+    // console.log('dropBlock')
     clearInterval(downInterval);
     downInterval = setInterval(() => {
         moveBlock('top',1);
@@ -213,5 +218,11 @@ document.addEventListener('keydown',e=>{
             break;
     }
 });
+
+$retryButton.addEventListener('click', ()=>{
+    $tbody.innerHTML = "";
+    $gameText.style.display = 'none';
+    init();
+}) 
 
 init();
